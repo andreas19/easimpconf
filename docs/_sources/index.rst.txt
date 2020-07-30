@@ -1,0 +1,23 @@
+EaSimpConf |version|
+====================
+
+
+Contents
+--------
+
+
+.. toctree::
+   :maxdepth: 2
+
+   overview
+   mod_api
+   license
+
+
+
+Indices and tables
+------------------
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

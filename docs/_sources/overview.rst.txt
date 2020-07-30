@@ -1,0 +1,29 @@
+Overview
+========
+
+**Ea**\ sy and **Simp**\ le **Conf**\ iguration.
+
+Installation
+------------
+
+.. highlight:: none
+
+::
+
+# pip install easimpconf
+
+
+Requirements
+------------
+
+.. include:: requirements.incl
+
+
+Links
+-----
+
+- PyPI: https://pypi.org/project/easimpconf/
+- GitHub: https://github.com/andreas19/easimpconf/
+
+
+.. include:: ../../CHANGELOG.md
