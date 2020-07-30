@@ -1,7 +1,7 @@
 Overview
 ========
 
-**Ea**\ sy and **Simp**\ le **Conf**\ iguration.
+Easy and Simple Configuration.
 
 Installation
 ------------
