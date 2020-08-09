@@ -1,0 +1,154 @@
+Introduction
+============
+
+.. py:currentmodule:: easimpconf
+
+Easy and simple configuration.
+
+.. _ref-spec:
+
+This module uses a specification when reading a configuration file with a
+:class:`~configparser.ConfigParser` (see module :mod:`configparser` for more
+information). Option values will be converted with the specified converter
+function, it will be checked whether an option is required or not, default
+values can be given for options that are not present in the configuration,
+and it can be specified if an option is readonly or not. All this is done by
+calling :func:`configure` which returns a :class:`Config` object.
+
+If ``create_properties=True`` in :func:`configure` the name of each property
+will be a concatenation of the section name and the option name with an
+underscore (``_``) in between. The resulting string must be a valid Python
+identifier. If ``create_properties=False`` this restriction does not apply.
+
+.. _ref-tags:
+
+The specification itself uses an INI-style configuration in which the
+sections and options are described. The separator character, the default
+access mode (readonly or not), and the tags which are used in the
+specification for each option can be modified in a special section
+``[_configspec_]``. The defaults are::
+
+   [_configspec_]
+   readonly: yes
+   separator: ;
+   novalue: :novalue:
+   empty: :empty:
+   none: :none:
+   req_tag: :req:
+   ro_tag: :ro:
+   rw_tag: :rw:
+   fix_tag: :fix:
+   raw_tag: :raw:
+
+A specification for an option looks like this::
+
+   opt = conv | :novalue:[; dflt | :req:][; :rw: | :ro: | :fix:][; :raw:]
+
+The converter ``conv`` must be the name of a callable that takes a string
+argument and returns an object of the desired type. The default converters are:
+``int``, ``float``, ``str``, and ``bool``. The first three are just the
+built-in functions with the same name. For what strings ``bool`` considers
+``True`` or ``False`` see: :data:`~salmagundi.strings.BOOLEAN_STATES`.
+These converters can be overwritten or more can be added by using a dictionary
+where each key is a converter name and each value is a converter callable.
+This dictionary must be passed to :func:`configure` as the ``converters``
+argument.
+
+The default value ``dflt`` and the required tag ``:req:`` are mutually
+exclusive. If an option is not found in the configuration and there is no
+default value for it, the option will be set to the value :data:`NOTFOUND`.
+An empty string as a default value can be specified by omitting the value
+or with the ``:empty:`` tag to make it more obvious: ``opt: str; :empty:``
+means the same as ``opt: str;`` (because of the semicolon after the
+converter *str*). For ``None`` as a default value the ``:none:`` tag must
+be used.
+
+With the readwrite tag ``:rw:`` and the readonly tag ``:ro:`` exceptions
+to the global access mode (see above) can be set for each option.
+
+If the ``:fix:`` tag is used, it indicates that the option cannot be changed
+in a configuration file and is therefore a constant. In this case a
+default value is required.
+
+The raw tag ``:raw:`` indicates that for the option value no interpolation
+expansion should be done (see: :meth:`~configparser.ConfigParser.get`).
+
+For configurations that allow options without values the ``allow_no_value``
+parameter for :func:`configure` must be set to ``True`` (this is one of
+the keyword arguments that is passed directly the
+:class:`~configparser.ConfigParser` constructor). For such an option the tag
+``:novalue:`` must be used instead of the name of a converter. If the option
+is present in the configuration it will be set to the value :data:`NOVALUE`.
+
+If ``spec=None``, no conversion will be done and all options are writeable.
+
+Example:
+
+.. code-block:: ini
+
+   # spec.ini
+   [sec]
+   greeting: str; Hello %s!; :raw:
+   answer: int; :req:
+   string: upper
+   bar: str; :rw:
+
+   # conf.ini
+   [sec]
+   answer: 42
+   string: abc
+
+>>> convs = {'upper': str.upper}
+>>> conf = cfg.configure('conf.ini', 'spec.ini', converters=convs)
+>>> conf['sec','greeting']
+'Hello %s!'
+>>> conf.sec_answer
+42
+>>> conf.sec_string
+'ABC'
+>>> ('sec', 'foo') in conf
+False
+>>> ('sec', 'bar') in conf
+True
+>>> conf['sec', 'bar']
+<NOTFOUND>
+>>> conf['sec', 'bar'] = 'quux'
+>>> conf['sec', 'bar']
+'quux'
+>>> conf.sec_string = 'XYZ'
+Traceback (most recent call last):
+  ...
+AttributeError: can't set attribute
+
+.. _ref-wildcards:
+
+Wildcards can be used in section and option names. Wildcard character(s)
+must be defined explicitly in the ``[_configspec_]`` section, e. g.:
+
+.. code-block:: ini
+
+   # spec.ini
+   [_configspec_]
+   wildcard: *
+
+   [menu]
+   title: str; :req:
+
+   [item_*]
+   title: str; :req:
+   command: str; :req:
+
+   # conf.ini
+   [menu]
+   title: Testmenu
+
+   [item_1]
+   title: Test config
+   command: pytest config.py
+
+   [item_2]
+   title: Test crypto
+   command: pytest crypto.py
+
+When wildcards are used in option names these options cannot have
+default values.

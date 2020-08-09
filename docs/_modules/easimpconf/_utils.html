@@ -1,0 +1,255 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>easimpconf._utils &#8212; EaSimpConf 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">EaSimpConf</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mod_api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  <li><a href="../easimpconf.html">easimpconf</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for easimpconf._utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Utils module.&quot;&quot;&quot;</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;convert_choice&#39;</span><span class="p">,</span> <span class="s1">&#39;convert_loglevel&#39;</span><span class="p">,</span> <span class="s1">&#39;convert_predicate&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;convert_string&#39;</span><span class="p">,</span> <span class="s1">&#39;create_getter&#39;</span><span class="p">,</span> <span class="s1">&#39;create_setter&#39;</span><span class="p">,</span> <span class="s1">&#39;create_deleter&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="convert_choice"><a class="viewcode-back" href="../../mod_api.html#easimpconf.convert_choice">[docs]</a><span class="k">def</span> <span class="nf">convert_choice</span><span class="p">(</span><span class="n">choices</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">converter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a function that can be used as a converter.</span>
+
+<span class="sd">    For an example see the source code of :func:`convert_loglevel`.</span>
+
+<span class="sd">    :param choices: any container type that supports the ``in`` operator</span>
+<span class="sd">                    with acceptable values</span>
+<span class="sd">    :param converter: a callable that takes one string argument and returns</span>
+<span class="sd">                      an object of the desired type; ``None`` means no</span>
+<span class="sd">                      conversion</span>
+<span class="sd">    :param default: a default value of the desired type or a subclass</span>
+<span class="sd">                    of :exc:`Exception` which will be raised</span>
+<span class="sd">    :return: converter function</span>
+<span class="sd">    :rtype: function(str)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">converter</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">if</span> <span class="n">converter</span> <span class="k">else</span> <span class="n">s</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">choices</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">x</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">default</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;invalid choice: </span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">default</span>
+    <span class="k">return</span> <span class="n">f</span></div>
+
+
+<span class="n">_LOGLEVELS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;NOTSET&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s1">&#39;DEBUG&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="s1">&#39;INFO&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="s1">&#39;WARNING&#39;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+    <span class="s1">&#39;ERROR&#39;</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span>
+    <span class="s1">&#39;CRITICAL&#39;</span><span class="p">:</span> <span class="mi">50</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="convert_loglevel"><a class="viewcode-back" href="../../mod_api.html#easimpconf.convert_loglevel">[docs]</a><span class="k">def</span> <span class="nf">convert_loglevel</span><span class="p">(</span><span class="n">default_level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">numeric</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a converter function for logging levels.</span>
+
+<span class="sd">    Valid values are the logging levels as defined in the :mod:`logging` module.</span>
+
+<span class="sd">    :param str default_level: the default logging level</span>
+<span class="sd">    :param bool numeric: if ``True`` the numeric value of the log level</span>
+<span class="sd">                         will be returned</span>
+<span class="sd">    :raises ValueError: if not a valid logging level and ``default_level=None``</span>
+<span class="sd">    :return: converter function</span>
+<span class="sd">    :rtype: function(str)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">numeric</span><span class="p">:</span>
+        <span class="n">choices</span> <span class="o">=</span> <span class="n">_LOGLEVELS</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="n">converter</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">_LOGLEVELS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">s</span><span class="p">)</span>  <span class="c1"># noqa: E731</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">choices</span> <span class="o">=</span> <span class="n">_LOGLEVELS</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="n">converter</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>  <span class="c1"># noqa: E731</span>
+    <span class="n">default</span> <span class="o">=</span> <span class="n">default_level</span> <span class="ow">or</span> <span class="ne">ValueError</span>
+    <span class="k">return</span> <span class="n">convert_choice</span><span class="p">(</span><span class="n">choices</span><span class="p">,</span> <span class="n">converter</span><span class="o">=</span><span class="n">converter</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="convert_predicate"><a class="viewcode-back" href="../../mod_api.html#easimpconf.convert_predicate">[docs]</a><span class="k">def</span> <span class="nf">convert_predicate</span><span class="p">(</span><span class="n">predicate</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">converter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a converter function with a predicate.</span>
+
+<span class="sd">    &gt;&gt;&gt; positive_float = convert_predicate(lambda x: x &gt; 0.0,</span>
+<span class="sd">    ... converter=float, default=0.0)</span>
+<span class="sd">    &gt;&gt;&gt; positive_float(&#39;1.2&#39;)</span>
+<span class="sd">    1.2</span>
+<span class="sd">    &gt;&gt;&gt; positive_float(&#39;-1.2&#39;)</span>
+<span class="sd">    0.0</span>
+
+<span class="sd">    :param predicate: a callable that takes one argument of the desired type</span>
+<span class="sd">                      and returns ``True`` if it is acceptable</span>
+<span class="sd">    :param converter: a callable that takes one string argument and returns</span>
+<span class="sd">                      an object of the desired type; ``None`` means no</span>
+<span class="sd">                      conversion</span>
+<span class="sd">    :param default: a default value of the desired type or a subclass</span>
+<span class="sd">                    of :exc:`Exception` which will be raised instead</span>
+<span class="sd">    :return: converter function</span>
+<span class="sd">    :rtype: function(str)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">converter</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">if</span> <span class="n">converter</span> <span class="k">else</span> <span class="n">s</span>
+        <span class="k">if</span> <span class="n">predicate</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">x</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">default</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;invalid value: </span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">default</span>
+    <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="convert_string"><a class="viewcode-back" href="../../mod_api.html#easimpconf.convert_string">[docs]</a><span class="k">def</span> <span class="nf">convert_string</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s1">&#39;|&#39;</span><span class="p">,</span> <span class="n">newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a function that can be used as a converter.</span>
+
+<span class="sd">    The default converter ``str`` handles multiline values like</span>
+<span class="sd">    :class:`~configparser.ConfigParser`, i.e. preserving newlines but</span>
+<span class="sd">    ignoring indentations (because nothing gets realy converted).</span>
+
+<span class="sd">    A converter returned by this function can handle such values different.</span>
+
+<span class="sd">    &gt;&gt;&gt; s = &#39;&#39;&#39;</span>
+<span class="sd">    ... |def add(a, b):</span>
+<span class="sd">    ... |    return a + b</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &gt;&gt;&gt; print(convert_string()(s))</span>
+<span class="sd">    def add(a, b):</span>
+<span class="sd">        return a + b</span>
+
+<span class="sd">    :param str start: a single none-whitspace character that starts a line</span>
+<span class="sd">    :param bool newlines: if ``True`` newlines will be preserved</span>
+<span class="sd">    :raises ValueError: if ``start`` is not a single character</span>
+<span class="sd">    :return: converter function</span>
+<span class="sd">    :rtype: function(str)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">start</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">start</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;parameter &#39;start&#39; must be a single&quot;</span>
+                         <span class="s2">&quot; none-whitespace character&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">line</span><span class="p">:</span> <span class="n">line</span> <span class="ow">and</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">start</span><span class="p">,</span> <span class="n">lines</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;all lines must start with </span><span class="si">{</span><span class="n">start</span><span class="si">!r}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="k">if</span> <span class="n">newlines</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">f</span></div>
+
+
+<span class="k">def</span> <span class="nf">create_getter</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create getter method.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">f</span>
+
+
+<span class="k">def</span> <span class="nf">create_setter</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create setter method.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">f</span>
+
+
+<span class="k">def</span> <span class="nf">create_deleter</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create deleter method.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">f</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2020, Andreas Suhre.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

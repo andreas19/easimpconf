@@ -4,6 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>API Reference &#8212; EaSimpConf 0.1.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +17,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="License" href="license.html" />
-    <link rel="prev" title="Overview" href="overview.html" />
+    <link rel="prev" title="Introduction" href="intro.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -40,6 +41,7 @@
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
 </ul>
@@ -51,7 +53,7 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="overview.html" title="previous chapter">Overview</a></li>
+      <li>Previous: <a href="intro.html" title="previous chapter">Introduction</a></li>
       <li>Next: <a href="license.html" title="next chapter">License</a></li>
   </ul></li>
 </ul>
@@ -82,138 +84,15 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="module-easimpconf">
-<span id="api-reference"></span><h1>API Reference<a class="headerlink" href="#module-easimpconf" title="Permalink to this headline">¶</a></h1>
-<p>Easy and simple configuration.</p>
-<p id="ref-spec">This module uses a specification when reading a configuration file with a
-<a class="reference external" href="https://docs.python.org/3/library/configparser.html#configparser.ConfigParser" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigParser</span></code></a> (see module <a class="reference external" href="https://docs.python.org/3/library/configparser.html#module-configparser" title="(in Python v3.8)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">configparser</span></code></a> for more
-information). Option values will be converted with the specified converter
-function, it will be checked whether an option is required or not, default
-values can be given for options that are not present in the configuration,
-and it can be specified if an option is readonly or not. All this is done by
-calling <a class="reference internal" href="#easimpconf.configure" title="easimpconf.configure"><code class="xref py py-func docutils literal notranslate"><span class="pre">configure()</span></code></a> which returns a <a class="reference internal" href="#easimpconf.Config" title="easimpconf.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">Config</span></code></a> object.</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">create_properties=True</span></code> in <a class="reference internal" href="#easimpconf.configure" title="easimpconf.configure"><code class="xref py py-func docutils literal notranslate"><span class="pre">configure()</span></code></a> the name of each property
-will be a concatenation of the section name and the option name with an
-underscore (<code class="docutils literal notranslate"><span class="pre">_</span></code>) in between. The resulting string must be a valid Python
-identifier. If <code class="docutils literal notranslate"><span class="pre">create_properties=False</span></code> this restriction does not apply.</p>
-<p id="ref-tags">The specification itself uses an INI-style configuration in which the
-sections and options are described. The separator character, the default
-access mode (readonly or not), and the tags which are used in the
-specification for each option can be modified in a special section
-<code class="docutils literal notranslate"><span class="pre">[_configspec_]</span></code>. The defaults are:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">_configspec_</span><span class="p">]</span>
-<span class="n">readonly</span><span class="p">:</span> <span class="n">yes</span>
-<span class="n">separator</span><span class="p">:</span> <span class="p">;</span>
-<span class="n">novalue</span><span class="p">:</span> <span class="p">:</span><span class="n">novalue</span><span class="p">:</span>
-<span class="n">empty</span><span class="p">:</span> <span class="p">:</span><span class="n">empty</span><span class="p">:</span>
-<span class="n">none</span><span class="p">:</span> <span class="p">:</span><span class="n">none</span><span class="p">:</span>
-<span class="n">req_tag</span><span class="p">:</span> <span class="p">:</span><span class="n">req</span><span class="p">:</span>
-<span class="n">ro_tag</span><span class="p">:</span> <span class="p">:</span><span class="n">ro</span><span class="p">:</span>
-<span class="n">rw_tag</span><span class="p">:</span> <span class="p">:</span><span class="n">rw</span><span class="p">:</span>
-<span class="n">fix_tag</span><span class="p">:</span> <span class="p">:</span><span class="n">fix</span><span class="p">:</span>
-<span class="n">raw_tag</span><span class="p">:</span> <span class="p">:</span><span class="n">raw</span><span class="p">:</span>
-</pre></div>
+  <div class="section" id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.2.0: </span>Interpolation of values in configuration files now works with default values
+from the specification if a value is not present in the configuration file
+(except for section names with wildcards).</p>
 </div>
-<p>A specification for an option looks like this:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">opt</span> <span class="o">=</span> <span class="n">conv</span> <span class="o">|</span> <span class="p">:</span><span class="n">novalue</span><span class="p">:[;</span> <span class="n">dflt</span> <span class="o">|</span> <span class="p">:</span><span class="n">req</span><span class="p">:][;</span> <span class="p">:</span><span class="n">rw</span><span class="p">:</span> <span class="o">|</span> <span class="p">:</span><span class="n">ro</span><span class="p">:</span> <span class="o">|</span> <span class="p">:</span><span class="n">fix</span><span class="p">:][;</span> <span class="p">:</span><span class="n">raw</span><span class="p">:]</span>
-</pre></div>
-</div>
-<p>The converter <code class="docutils literal notranslate"><span class="pre">conv</span></code> must be the name of a callable that takes a string
-argument and returns an object of the desired type. The default converters are:
-<code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code>, and <code class="docutils literal notranslate"><span class="pre">bool</span></code>. The first three are just the
-built-in functions with the same name. For what strings <code class="docutils literal notranslate"><span class="pre">bool</span></code> considers
-<code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code> see: <code class="xref py py-data docutils literal notranslate"><span class="pre">BOOLEAN_STATES</span></code>.
-These converters can be overwritten or more can be added by using a dictionary
-where each key is a converter name and each value is a converter callable.
-This dictionary must be passed to <a class="reference internal" href="#easimpconf.configure" title="easimpconf.configure"><code class="xref py py-func docutils literal notranslate"><span class="pre">configure()</span></code></a> as the <code class="docutils literal notranslate"><span class="pre">converters</span></code>
-argument.</p>
-<p>The default value <code class="docutils literal notranslate"><span class="pre">dflt</span></code> and the required tag <code class="docutils literal notranslate"><span class="pre">:req:</span></code> are mutually
-exclusive. If an option is not found in the configuration and there is no
-default value for it, the option will be set to the value <a class="reference internal" href="#easimpconf.NOTFOUND" title="easimpconf.NOTFOUND"><code class="xref py py-data docutils literal notranslate"><span class="pre">NOTFOUND</span></code></a>.
-An empty string as a default value can be specified by omitting the value
-or with the <code class="docutils literal notranslate"><span class="pre">:empty:</span></code> tag to make it more obvious: <code class="docutils literal notranslate"><span class="pre">opt:</span> <span class="pre">str;</span> <span class="pre">:empty:</span></code>
-means the same as <code class="docutils literal notranslate"><span class="pre">opt:</span> <span class="pre">str;</span></code> (because of the semicolon after the
-converter <em>str</em>). For <code class="docutils literal notranslate"><span class="pre">None</span></code> as a default value the <code class="docutils literal notranslate"><span class="pre">:none:</span></code> tag must
-be used.</p>
-<p>With the readwrite tag <code class="docutils literal notranslate"><span class="pre">:rw:</span></code> and the readonly tag <code class="docutils literal notranslate"><span class="pre">:ro:</span></code> exceptions
-to the global access mode (see above) can be set for each option.</p>
-<p>If the <code class="docutils literal notranslate"><span class="pre">:fix:</span></code> tag is used, it indicates that the option cannot be changed
-in a configuration file and is therefore a constant. In this case a
-default value is required.</p>
-<p>The raw tag <code class="docutils literal notranslate"><span class="pre">:raw:</span></code> indicates that for the option value no interpolation
-expansion should be done (see: <a class="reference external" href="https://docs.python.org/3/library/configparser.html#configparser.ConfigParser.get" title="(in Python v3.8)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get()</span></code></a>).</p>
-<p>For configurations that allow options without values the <code class="docutils literal notranslate"><span class="pre">allow_no_value</span></code>
-parameter for <a class="reference internal" href="#easimpconf.configure" title="easimpconf.configure"><code class="xref py py-func docutils literal notranslate"><span class="pre">configure()</span></code></a> must be set to <code class="docutils literal notranslate"><span class="pre">True</span></code> (this is one of
-the keyword arguments that is passed directly the
-<a class="reference external" href="https://docs.python.org/3/library/configparser.html#configparser.ConfigParser" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigParser</span></code></a> constructor). For such an option the tag
-<code class="docutils literal notranslate"><span class="pre">:novalue:</span></code> must be used instead of the name of a converter. If the option
-is present in the configuration it will be set to the value <a class="reference internal" href="#easimpconf.NOVALUE" title="easimpconf.NOVALUE"><code class="xref py py-data docutils literal notranslate"><span class="pre">NOVALUE</span></code></a>.</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">spec=None</span></code>, no conversion will be done and all options are writeable.</p>
-<p>Example:</p>
-<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1"># spec.ini</span>
-<span class="k">[sec]</span>
-<span class="na">greeting: str; Hello %s!; :raw:</span>
-<span class="na">answer: int; :req:</span>
-<span class="na">string: upper</span>
-<span class="na">bar: str; :rw:</span>
-
-<span class="c1"># conf.ini</span>
-<span class="k">[sec]</span>
-<span class="na">answer: 42</span>
-<span class="na">string: abc</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">convs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;upper&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="o">.</span><span class="n">upper</span><span class="p">}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="s1">&#39;conf.ini&#39;</span><span class="p">,</span> <span class="s1">&#39;spec.ini&#39;</span><span class="p">,</span> <span class="n">converters</span><span class="o">=</span><span class="n">convs</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span><span class="p">[</span><span class="s1">&#39;sec&#39;</span><span class="p">,</span><span class="s1">&#39;greeting&#39;</span><span class="p">]</span>
-<span class="go">&#39;Hello %s!&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span><span class="o">.</span><span class="n">sec_answer</span>
-<span class="go">42</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span><span class="o">.</span><span class="n">sec_string</span>
-<span class="go">&#39;ABC&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="s1">&#39;sec&#39;</span><span class="p">,</span> <span class="s1">&#39;foo&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">conf</span>
-<span class="go">False</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="s1">&#39;sec&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">conf</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span><span class="p">[</span><span class="s1">&#39;sec&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">]</span>
-<span class="go">&lt;NOTFOUND&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span><span class="p">[</span><span class="s1">&#39;sec&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;quux&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span><span class="p">[</span><span class="s1">&#39;sec&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">]</span>
-<span class="go">&#39;quux&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span><span class="o">.</span><span class="n">sec_string</span> <span class="o">=</span> <span class="s1">&#39;XYZ&#39;</span>
-<span class="gt">Traceback (most recent call last):</span>
-  <span class="c">...</span>
-<span class="gr">AttributeError</span>: <span class="n">can&#39;t set attribute</span>
-</pre></div>
-</div>
-<p id="ref-wildcards">Wildcards can be used in section and option names. Wildcard character(s)
-must be defined explicitly in the <code class="docutils literal notranslate"><span class="pre">[_configspec_]</span></code> section, e. g.:</p>
-<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1"># spec.ini</span>
-<span class="k">[_configspec_]</span>
-<span class="na">wildcard: *</span>
-
-<span class="k">[menu]</span>
-<span class="na">title: str; :req:</span>
-
-<span class="k">[item_*]</span>
-<span class="na">title: str; :req:</span>
-<span class="na">command: str; :req:</span>
-
-<span class="c1"># conf.ini</span>
-<span class="k">[menu]</span>
-<span class="na">title: Testmenu</span>
-
-<span class="k">[item_1]</span>
-<span class="na">title: Test config</span>
-<span class="na">command: pytest config.py</span>
-
-<span class="k">[item_2]</span>
-<span class="na">title: Test crypto</span>
-<span class="na">command: pytest crypto.py</span>
-</pre></div>
-</div>
-<p>When wildcards are used in option names these options cannot have
-default values.</p>
+<span class="target" id="module-easimpconf"></span><p>Easy and simple configuration.</p>
+<p>See also: <a class="reference internal" href="intro.html"><span class="doc">Introduction</span></a></p>
 <div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <table class="longtable docutils align-default">
@@ -226,7 +105,7 @@ default values.</p>
 <td><p>Special value for options that are not found and have no default.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#easimpconf.NOVALUE" title="easimpconf.NOVALUE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NOVALUE</span></code></a></p></td>
-<td><p>Special value for options without a value (see above).</p></td>
+<td><p>Special value for options without a value.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#easimpconf.Config" title="easimpconf.Config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Config</span></code></a></p></td>
 <td><p>Configuration class.</p></td>
@@ -247,7 +126,7 @@ default values.</p>
 <td><p>Raised if there is a problem with the specification.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#easimpconf.configure" title="easimpconf.configure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configure</span></code></a></p></td>
-<td><p>For an explanation see <a class="reference internal" href="#ref-spec"><span class="std std-ref">above</span></a>.</p></td>
+<td><p>For an explanation see the <a class="reference internal" href="intro.html"><span class="doc">Introduction</span></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#easimpconf.convert_choice" title="easimpconf.convert_choice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_choice</span></code></a></p></td>
 <td><p>Return a function that can be used as a converter.</p></td>
@@ -264,56 +143,26 @@ default values.</p>
 </tbody>
 </table>
 <dl class="py data">
-<dt id="easimpconf.NOVALUE">
-<code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">NOVALUE</code><em class="property"> = &lt;NOVALUE&gt;</em><a class="headerlink" href="#easimpconf.NOVALUE" title="Permalink to this definition">¶</a></dt>
-<dd><p>Special value for options without a value (see above).</p>
-<p>The truth value is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
-</dd></dl>
-
-<dl class="py data">
 <dt id="easimpconf.NOTFOUND">
-<code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">NOTFOUND</code><em class="property"> = &lt;NOTFOUND&gt;</em><a class="headerlink" href="#easimpconf.NOTFOUND" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">NOTFOUND</code><a class="headerlink" href="#easimpconf.NOTFOUND" title="Permalink to this definition">¶</a></dt>
 <dd><p>Special value for options that are not found and have no default.</p>
 <p>The truth value is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
 </dd></dl>
 
-<dl class="py exception">
-<dt id="easimpconf.Error">
-<em class="property">exception </em><code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">Error</code><a class="reference internal" href="_modules/easimpconf.html#Error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.Error" title="Permalink to this definition">¶</a></dt>
-<dd><p>Base Exception.</p>
-</dd></dl>
-
-<dl class="py exception">
-<dt id="easimpconf.ConfigError">
-<em class="property">exception </em><code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">ConfigError</code><a class="reference internal" href="_modules/easimpconf.html#ConfigError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.ConfigError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raised if there is a problem with the configuration.</p>
-</dd></dl>
-
-<dl class="py exception">
-<dt id="easimpconf.DuplicateError">
-<em class="property">exception </em><code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">DuplicateError</code><a class="reference internal" href="_modules/easimpconf.html#DuplicateError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.DuplicateError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raised if an option already exists in a section.</p>
-</dd></dl>
-
-<dl class="py exception">
-<dt id="easimpconf.SpecError">
-<em class="property">exception </em><code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">SpecError</code><a class="reference internal" href="_modules/easimpconf.html#SpecError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.SpecError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raised if there is a problem with the specification.</p>
-</dd></dl>
-
-<dl class="py exception">
-<dt id="easimpconf.ReadonlyError">
-<em class="property">exception </em><code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">ReadonlyError</code><a class="reference internal" href="_modules/easimpconf.html#ReadonlyError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.ReadonlyError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raised on an attempt to set a readonly option.</p>
+<dl class="py data">
+<dt id="easimpconf.NOVALUE">
+<code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">NOVALUE</code><a class="headerlink" href="#easimpconf.NOVALUE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Special value for options without a value (see <a class="reference internal" href="intro.html"><span class="doc">Introduction</span></a>).</p>
+<p>The truth value is <code class="docutils literal notranslate"><span class="pre">True</span></code></p>
 </dd></dl>
 
 <dl class="py class">
 <dt id="easimpconf.Config">
-<em class="property">class </em><code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">Config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">options</span></em>, <em class="sig-param"><span class="n">create_props</span></em>, <em class="sig-param"><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf.html#Config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.Config" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">Config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">options</span></em>, <em class="sig-param"><span class="n">create_props</span></em>, <em class="sig-param"><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf/_config.html#Config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.Config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Configuration class.</p>
 <p>An instance of this class is returned by the function <a class="reference internal" href="#easimpconf.configure" title="easimpconf.configure"><code class="xref py py-func docutils literal notranslate"><span class="pre">configure()</span></code></a>.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">create_properties=True</span></code> it will have a property for each configuration
-option named as explained <a class="reference internal" href="#ref-spec"><span class="std std-ref">above</span></a>. For extra data this is
+option named as explained in the <a class="reference internal" href="intro.html"><span class="doc">Introduction</span></a>. For extra data this is
 just the name given in the <a class="reference internal" href="#easimpconf.Config.add" title="easimpconf.Config.add"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add()</span></code></a> method.</p>
 <p>Options can also be accessed like this: <code class="docutils literal notranslate"><span class="pre">config[secname,</span> <span class="pre">optname]</span></code>.
 To check if an option exists, the <code class="docutils literal notranslate"><span class="pre">in</span></code> operator can be used:
@@ -325,7 +174,7 @@ equivalent as are <code class="docutils literal notranslate"><span class="pre">(
 for each option: <code class="docutils literal notranslate"><span class="pre">(secname,</span> <span class="pre">optname,</span> <span class="pre">value)</span></code>.</p>
 <dl class="py method">
 <dt id="easimpconf.Config.add">
-<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">readonly</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf.html#Config.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.Config.add" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">readonly</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf/_config.html#Config.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.Config.add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add extra data to configuration or an option to a section.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -356,7 +205,7 @@ accessed with <code class="docutils literal notranslate"><span class="pre">cfg['
 
 <dl class="py method">
 <dt id="easimpconf.Config.sections">
-<code class="sig-name descname">sections</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf.html#Config.sections"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.Config.sections" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">sections</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf/_config.html#Config.sections"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.Config.sections" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return section names.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -370,7 +219,7 @@ accessed with <code class="docutils literal notranslate"><span class="pre">cfg['
 
 <dl class="py method">
 <dt id="easimpconf.Config.options">
-<code class="sig-name descname">options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">section</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf.html#Config.options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.Config.options" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">section</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf/_config.html#Config.options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.Config.options" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return option names in the specified section.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -387,7 +236,7 @@ accessed with <code class="docutils literal notranslate"><span class="pre">cfg['
 
 <dl class="py method">
 <dt id="easimpconf.Config.extras">
-<code class="sig-name descname">extras</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf.html#Config.extras"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.Config.extras" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">extras</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf/_config.html#Config.extras"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.Config.extras" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return names of extra data added with <a class="reference internal" href="#easimpconf.Config.add" title="easimpconf.Config.add"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -401,7 +250,7 @@ accessed with <code class="docutils literal notranslate"><span class="pre">cfg['
 
 <dl class="py method">
 <dt id="easimpconf.Config.as_dict">
-<code class="sig-name descname">as_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">section</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf.html#Config.as_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.Config.as_dict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">as_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">section</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf/_config.html#Config.as_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.Config.as_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return options and values in a section as a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -418,7 +267,7 @@ accessed with <code class="docutils literal notranslate"><span class="pre">cfg['
 
 <dl class="py method">
 <dt id="easimpconf.Config.write">
-<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">space_around_delimiters</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf.html#Config.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.Config.write" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">space_around_delimiters</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf/_config.html#Config.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.Config.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a representation of the configuration to the specified file.</p>
 <p>Extra data added with <a class="reference internal" href="#easimpconf.Config.add" title="easimpconf.Config.add"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add()</span></code></a> will be excluded.</p>
 <dl class="field-list simple">
@@ -436,7 +285,7 @@ spaces</p></li>
 
 <dl class="py method">
 <dt id="easimpconf.Config.debug_info">
-<code class="sig-name descname">debug_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf.html#Config.debug_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.Config.debug_info" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">debug_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf/_config.html#Config.debug_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.Config.debug_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an iterator for debugging.</p>
 <p>It yields 5-tuples <code class="docutils literal notranslate"><span class="pre">(sec,</span> <span class="pre">opt,</span> <span class="pre">name,</span> <span class="pre">value,</span> <span class="pre">readonly)</span></code>
 for each option.</p>
@@ -444,10 +293,40 @@ for each option.</p>
 
 </dd></dl>
 
+<dl class="py exception">
+<dt id="easimpconf.ConfigError">
+<em class="property">exception </em><code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">ConfigError</code><a class="reference internal" href="_modules/easimpconf/_errors.html#ConfigError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.ConfigError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised if there is a problem with the configuration.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="easimpconf.DuplicateError">
+<em class="property">exception </em><code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">DuplicateError</code><a class="reference internal" href="_modules/easimpconf/_errors.html#DuplicateError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.DuplicateError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised if an option already exists in a section.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="easimpconf.Error">
+<em class="property">exception </em><code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">Error</code><a class="reference internal" href="_modules/easimpconf/_errors.html#Error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.Error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base Exception.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="easimpconf.ReadonlyError">
+<em class="property">exception </em><code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">ReadonlyError</code><a class="reference internal" href="_modules/easimpconf/_errors.html#ReadonlyError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.ReadonlyError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised on an attempt to set a readonly option.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="easimpconf.SpecError">
+<em class="property">exception </em><code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">SpecError</code><a class="reference internal" href="_modules/easimpconf/_errors.html#SpecError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.SpecError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised if there is a problem with the specification.</p>
+</dd></dl>
+
 <dl class="py function">
 <dt id="easimpconf.configure">
 <code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">configure</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conf</span></em>, <em class="sig-param"><span class="n">spec</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">create_properties</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">converters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf.html#configure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.configure" title="Permalink to this definition">¶</a></dt>
-<dd><p>For an explanation see <a class="reference internal" href="#ref-spec"><span class="std std-ref">above</span></a>.</p>
+<dd><p>For an explanation see the <a class="reference internal" href="intro.html"><span class="doc">Introduction</span></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -483,7 +362,7 @@ object)</p></li>
 
 <dl class="py function">
 <dt id="easimpconf.convert_choice">
-<code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">convert_choice</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">choices</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">converter</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf.html#convert_choice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.convert_choice" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">convert_choice</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">choices</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">converter</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf/_utils.html#convert_choice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.convert_choice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a function that can be used as a converter.</p>
 <p>For an example see the source code of <a class="reference internal" href="#easimpconf.convert_loglevel" title="easimpconf.convert_loglevel"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_loglevel()</span></code></a>.</p>
 <dl class="field-list simple">
@@ -509,7 +388,7 @@ of <a class="reference external" href="https://docs.python.org/3/library/excepti
 
 <dl class="py function">
 <dt id="easimpconf.convert_loglevel">
-<code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">convert_loglevel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">default_level</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">numeric</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf.html#convert_loglevel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.convert_loglevel" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">convert_loglevel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">default_level</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">numeric</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf/_utils.html#convert_loglevel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.convert_loglevel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a converter function for logging levels.</p>
 <p>Valid values are the logging levels as defined in the <a class="reference external" href="https://docs.python.org/3/library/logging.html#module-logging" title="(in Python v3.8)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">logging</span></code></a> module.</p>
 <dl class="field-list simple">
@@ -534,7 +413,7 @@ will be returned</p></li>
 
 <dl class="py function">
 <dt id="easimpconf.convert_predicate">
-<code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">convert_predicate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">predicate</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">converter</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf.html#convert_predicate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.convert_predicate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">convert_predicate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">predicate</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">converter</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf/_utils.html#convert_predicate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.convert_predicate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a converter function with a predicate.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">positive_float</span> <span class="o">=</span> <span class="n">convert_predicate</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">,</span>
 <span class="gp">... </span><span class="n">converter</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
@@ -567,7 +446,7 @@ of <a class="reference external" href="https://docs.python.org/3/library/excepti
 
 <dl class="py function">
 <dt id="easimpconf.convert_string">
-<code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">convert_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">start</span><span class="o">=</span><span class="default_value">'|'</span></em>, <em class="sig-param"><span class="n">newlines</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf.html#convert_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.convert_string" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">easimpconf.</code><code class="sig-name descname">convert_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">start</span><span class="o">=</span><span class="default_value">'|'</span></em>, <em class="sig-param"><span class="n">newlines</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easimpconf/_utils.html#convert_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easimpconf.convert_string" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a function that can be used as a converter.</p>
 <p>The default converter <code class="docutils literal notranslate"><span class="pre">str</span></code> handles multiline values like
 <a class="reference external" href="https://docs.python.org/3/library/configparser.html#configparser.ConfigParser" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigParser</span></code></a>, i.e. preserving newlines but
@@ -615,7 +494,7 @@ ignoring indentations (because nothing gets realy converted).</p>
       &copy;2020, Andreas Suhre.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.3</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

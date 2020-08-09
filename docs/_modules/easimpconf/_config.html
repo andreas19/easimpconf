@@ -1,0 +1,317 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>easimpconf._config &#8212; EaSimpConf 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">EaSimpConf</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mod_api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  <li><a href="../easimpconf.html">easimpconf</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for easimpconf._config</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Config module.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">configparser</span> <span class="kn">import</span> <span class="n">ConfigParser</span>
+
+<span class="kn">from</span> <span class="nn">salmagundi.utils</span> <span class="kn">import</span> <span class="n">check_path_like</span>
+
+<span class="kn">from</span> <span class="nn">._errors</span> <span class="kn">import</span> <span class="n">ReadonlyError</span><span class="p">,</span> <span class="n">DuplicateError</span><span class="p">,</span> <span class="n">ConfigError</span>
+<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">create_getter</span><span class="p">,</span> <span class="n">create_setter</span><span class="p">,</span> <span class="n">create_deleter</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Config&#39;</span><span class="p">,</span> <span class="s1">&#39;NOVALUE&#39;</span><span class="p">,</span> <span class="s1">&#39;NOTFOUND&#39;</span><span class="p">]</span>
+
+
+<span class="n">NOVALUE</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;NoValue&#39;</span><span class="p">,</span> <span class="p">(),</span> <span class="p">{</span>
+    <span class="s1">&#39;__repr__&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;&lt;NOVALUE&gt;&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;__doc__&#39;</span><span class="p">:</span> <span class="s1">&#39;Special value for options without a value.&#39;</span><span class="p">})()</span>
+<span class="sd">&quot;&quot;&quot;Special value for options without a value (see :doc:`intro`).</span>
+
+<span class="sd">The truth value is ``True``.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">NOTFOUND</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;NotFound&#39;</span><span class="p">,</span> <span class="p">(),</span> <span class="p">{</span>
+    <span class="s1">&#39;__repr__&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;&lt;NOTFOUND&gt;&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;__bool__&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s1">&#39;__doc__&#39;</span><span class="p">:</span> <span class="s1">&#39;Special value for options that are not &#39;</span>
+               <span class="s1">&#39;found and have no default.&#39;</span><span class="p">})()</span>
+<span class="sd">&quot;&quot;&quot;Special value for options that are not found and have no default.</span>
+
+<span class="sd">The truth value is ``False``.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">_key</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">key</span>
+
+
+<div class="viewcode-block" id="Config"><a class="viewcode-back" href="../../mod_api.html#easimpconf.Config">[docs]</a><span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Configuration class.</span>
+
+<span class="sd">    An instance of this class is returned by the function :func:`configure`.</span>
+
+<span class="sd">    If ``create_properties=True`` it will have a property for each configuration</span>
+<span class="sd">    option named as explained in the :doc:`intro`. For extra data this is</span>
+<span class="sd">    just the name given in the :meth:`add` method.</span>
+
+<span class="sd">    Options can also be accessed like this: ``config[secname, optname]``.</span>
+<span class="sd">    To check if an option exists, the ``in`` operator can be used:</span>
+<span class="sd">    ``(secname, optname) in config``.</span>
+
+<span class="sd">    For extra data either ``None`` must be used for the section name or only</span>
+<span class="sd">    the name of the data, i.e. ``config[None, name]`` and ``config[name]`` are</span>
+<span class="sd">    equivalent as are ``(None, name) in config`` and ``name in config``.</span>
+
+<span class="sd">    When a :class:`Config` object is used as an iterator it yields 3-tuples</span>
+<span class="sd">    for each option: ``(secname, optname, value)``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">,</span> <span class="n">create_props</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_options</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">ro</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">options</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">options</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_props</span> <span class="o">=</span> <span class="n">create_props</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">((</span><span class="n">sec</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="n">sec</span><span class="p">,</span> <span class="n">opt</span><span class="p">])</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">sec</span><span class="p">,</span> <span class="n">opt</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_key</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="n">_key</span><span class="p">(</span><span class="n">key</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">_key</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="n">ReadonlyError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;cannot set option </span><span class="si">{</span><span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">!r}</span><span class="s1"> in section </span><span class="si">{</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">_key</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+            <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Config.add"><a class="viewcode-back" href="../../mod_api.html#easimpconf.Config.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">readonly</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add extra data to configuration or an option to a section.</span>
+
+<span class="sd">        :param key: either a name of extra data or a tuple</span>
+<span class="sd">                    ``(&#39;secname&#39;, &#39;optname&#39;)``</span>
+<span class="sd">        :type: str or tuple</span>
+<span class="sd">        :param value: the value of the data</span>
+<span class="sd">        :param bool readonly: if ``True`` the data cannot be changed</span>
+<span class="sd">        :raises DuplicateError: if an option already exists in a section</span>
+<span class="sd">        :raises AttributeError: if an attribute with the same name already</span>
+<span class="sd">                                exists (only if ``create_properties=True``)</span>
+<span class="sd">        :raises ConfigError: if ``create_properties=True`` and ``name`` or</span>
+<span class="sd">                             ``secname_optname`` is not a valid Python</span>
+<span class="sd">                             identifier; the data can still be</span>
+<span class="sd">                             accessed with ``cfg[&#39;name&#39;]`` or</span>
+<span class="sd">                             ``cfg[&#39;secname&#39;, &#39;optname&#39;]``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">_key</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DuplicateError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Key </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s1"> already exists&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_props</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">name</span> <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">isidentifier</span><span class="p">()</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span> <span class="n">readonly</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_props</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">isidentifier</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">ConfigError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;not a valid name: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;attribute </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s1"> already exists&#39;</span><span class="p">)</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="nb">property</span><span class="p">(</span><span class="n">create_getter</span><span class="p">(</span><span class="n">key</span><span class="p">),</span>
+                    <span class="kc">None</span> <span class="k">if</span> <span class="n">readonly</span>
+                    <span class="k">else</span> <span class="n">create_setter</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">create_deleter</span><span class="p">(</span><span class="n">key</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="Config.sections"><a class="viewcode-back" href="../../mod_api.html#easimpconf.Config.sections">[docs]</a>    <span class="k">def</span> <span class="nf">sections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return section names.</span>
+
+<span class="sd">        :return: list with section names</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lst</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">sec</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sec</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">sec</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+                <span class="n">lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sec</span><span class="p">)</span>
+                <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sec</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lst</span></div>
+
+<div class="viewcode-block" id="Config.options"><a class="viewcode-back" href="../../mod_api.html#easimpconf.Config.options">[docs]</a>    <span class="k">def</span> <span class="nf">options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return option names in the specified section.</span>
+
+<span class="sd">        :param str section: a section name</span>
+<span class="sd">        :return: list with option names</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">opt</span> <span class="k">for</span> <span class="p">(</span><span class="n">sec</span><span class="p">,</span> <span class="n">opt</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span>
+                    <span class="k">if</span> <span class="n">sec</span> <span class="o">==</span> <span class="n">section</span> <span class="ow">and</span> <span class="n">section</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Config.extras"><a class="viewcode-back" href="../../mod_api.html#easimpconf.Config.extras">[docs]</a>    <span class="k">def</span> <span class="nf">extras</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return names of extra data added with :meth:`add`.</span>
+
+<span class="sd">        :return: list with names of extra data</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">opt</span> <span class="k">for</span> <span class="p">(</span><span class="n">sec</span><span class="p">,</span> <span class="n">opt</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span> <span class="k">if</span> <span class="n">sec</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Config.as_dict"><a class="viewcode-back" href="../../mod_api.html#easimpconf.Config.as_dict">[docs]</a>    <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return options and values in a section as a :class:`dict`.</span>
+
+<span class="sd">        :param str section: a section name</span>
+<span class="sd">        :return: mapping option names =&gt; values</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">opt</span><span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="n">sec</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="n">sec</span> <span class="o">==</span> <span class="n">section</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="Config.write"><a class="viewcode-back" href="../../mod_api.html#easimpconf.Config.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">space_around_delimiters</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write a representation of the configuration to the specified file.</span>
+
+<span class="sd">        Extra data added with :meth:`add` will be excluded.</span>
+
+<span class="sd">        :param file: the file</span>
+<span class="sd">        :type file: :term:`path-like object` or :term:`text file`</span>
+<span class="sd">                    opened for writing</span>
+<span class="sd">        :param bool space_around_delimiters: if ``True``, delimiters between</span>
+<span class="sd">                                             keys and values are surrounded by</span>
+<span class="sd">                                             spaces</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">sec</span><span class="p">,</span> <span class="n">opt</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sec</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">sec</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">sec</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="n">sec</span><span class="p">,</span> <span class="n">opt</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">NOVALUE</span><span class="p">:</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">sec</span><span class="p">][</span><span class="n">opt</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">elif</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NOTFOUND</span><span class="p">:</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">sec</span><span class="p">][</span><span class="n">opt</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">[</span><span class="s1">&#39;interpolation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">cp</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">)</span>
+        <span class="n">cp</span><span class="o">.</span><span class="n">read_dict</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">check_path_like</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+                <span class="n">cp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fh</span><span class="p">,</span> <span class="n">space_around_delimiters</span><span class="o">=</span><span class="n">space_around_delimiters</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">cp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">space_around_delimiters</span><span class="o">=</span><span class="n">space_around_delimiters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Config.debug_info"><a class="viewcode-back" href="../../mod_api.html#easimpconf.Config.debug_info">[docs]</a>    <span class="k">def</span> <span class="nf">debug_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an iterator for debugging.</span>
+
+<span class="sd">        It yields 5-tuples ``(sec, opt, name, value, readonly)``</span>
+<span class="sd">        for each option.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">readonly</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">yield</span> <span class="p">(</span><span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">readonly</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2020, Andreas Suhre.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

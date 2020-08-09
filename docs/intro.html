@@ -1,0 +1,238 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Introduction &#8212; EaSimpConf 0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Reference" href="mod_api.html" />
+    <link rel="prev" title="Overview" href="overview.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">EaSimpConf</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mod_api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="overview.html" title="previous chapter">Overview</a></li>
+      <li>Next: <a href="mod_api.html" title="next chapter">API Reference</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>Easy and simple configuration.</p>
+<p id="ref-spec">This module uses a specification when reading a configuration file with a
+<a class="reference external" href="https://docs.python.org/3/library/configparser.html#configparser.ConfigParser" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigParser</span></code></a> (see module <a class="reference external" href="https://docs.python.org/3/library/configparser.html#module-configparser" title="(in Python v3.8)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">configparser</span></code></a> for more
+information). Option values will be converted with the specified converter
+function, it will be checked whether an option is required or not, default
+values can be given for options that are not present in the configuration,
+and it can be specified if an option is readonly or not. All this is done by
+calling <a class="reference internal" href="mod_api.html#easimpconf.configure" title="easimpconf.configure"><code class="xref py py-func docutils literal notranslate"><span class="pre">configure()</span></code></a> which returns a <a class="reference internal" href="mod_api.html#easimpconf.Config" title="easimpconf.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">Config</span></code></a> object.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">create_properties=True</span></code> in <a class="reference internal" href="mod_api.html#easimpconf.configure" title="easimpconf.configure"><code class="xref py py-func docutils literal notranslate"><span class="pre">configure()</span></code></a> the name of each property
+will be a concatenation of the section name and the option name with an
+underscore (<code class="docutils literal notranslate"><span class="pre">_</span></code>) in between. The resulting string must be a valid Python
+identifier. If <code class="docutils literal notranslate"><span class="pre">create_properties=False</span></code> this restriction does not apply.</p>
+<p id="ref-tags">The specification itself uses an INI-style configuration in which the
+sections and options are described. The separator character, the default
+access mode (readonly or not), and the tags which are used in the
+specification for each option can be modified in a special section
+<code class="docutils literal notranslate"><span class="pre">[_configspec_]</span></code>. The defaults are:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">_configspec_</span><span class="p">]</span>
+<span class="n">readonly</span><span class="p">:</span> <span class="n">yes</span>
+<span class="n">separator</span><span class="p">:</span> <span class="p">;</span>
+<span class="n">novalue</span><span class="p">:</span> <span class="p">:</span><span class="n">novalue</span><span class="p">:</span>
+<span class="n">empty</span><span class="p">:</span> <span class="p">:</span><span class="n">empty</span><span class="p">:</span>
+<span class="n">none</span><span class="p">:</span> <span class="p">:</span><span class="n">none</span><span class="p">:</span>
+<span class="n">req_tag</span><span class="p">:</span> <span class="p">:</span><span class="n">req</span><span class="p">:</span>
+<span class="n">ro_tag</span><span class="p">:</span> <span class="p">:</span><span class="n">ro</span><span class="p">:</span>
+<span class="n">rw_tag</span><span class="p">:</span> <span class="p">:</span><span class="n">rw</span><span class="p">:</span>
+<span class="n">fix_tag</span><span class="p">:</span> <span class="p">:</span><span class="n">fix</span><span class="p">:</span>
+<span class="n">raw_tag</span><span class="p">:</span> <span class="p">:</span><span class="n">raw</span><span class="p">:</span>
+</pre></div>
+</div>
+<p>A specification for an option looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">opt</span> <span class="o">=</span> <span class="n">conv</span> <span class="o">|</span> <span class="p">:</span><span class="n">novalue</span><span class="p">:[;</span> <span class="n">dflt</span> <span class="o">|</span> <span class="p">:</span><span class="n">req</span><span class="p">:][;</span> <span class="p">:</span><span class="n">rw</span><span class="p">:</span> <span class="o">|</span> <span class="p">:</span><span class="n">ro</span><span class="p">:</span> <span class="o">|</span> <span class="p">:</span><span class="n">fix</span><span class="p">:][;</span> <span class="p">:</span><span class="n">raw</span><span class="p">:]</span>
+</pre></div>
+</div>
+<p>The converter <code class="docutils literal notranslate"><span class="pre">conv</span></code> must be the name of a callable that takes a string
+argument and returns an object of the desired type. The default converters are:
+<code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code>, and <code class="docutils literal notranslate"><span class="pre">bool</span></code>. The first three are just the
+built-in functions with the same name. For what strings <code class="docutils literal notranslate"><span class="pre">bool</span></code> considers
+<code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code> see: <a class="reference external" href="https://andreas19.github.io/salmagundi/mod_strings.html#salmagundi.strings.BOOLEAN_STATES" title="(in Salmagundi v0.14.0)"><code class="xref py py-data docutils literal notranslate"><span class="pre">BOOLEAN_STATES</span></code></a>.
+These converters can be overwritten or more can be added by using a dictionary
+where each key is a converter name and each value is a converter callable.
+This dictionary must be passed to <a class="reference internal" href="mod_api.html#easimpconf.configure" title="easimpconf.configure"><code class="xref py py-func docutils literal notranslate"><span class="pre">configure()</span></code></a> as the <code class="docutils literal notranslate"><span class="pre">converters</span></code>
+argument.</p>
+<p>The default value <code class="docutils literal notranslate"><span class="pre">dflt</span></code> and the required tag <code class="docutils literal notranslate"><span class="pre">:req:</span></code> are mutually
+exclusive. If an option is not found in the configuration and there is no
+default value for it, the option will be set to the value <a class="reference internal" href="mod_api.html#easimpconf.NOTFOUND" title="easimpconf.NOTFOUND"><code class="xref py py-data docutils literal notranslate"><span class="pre">NOTFOUND</span></code></a>.
+An empty string as a default value can be specified by omitting the value
+or with the <code class="docutils literal notranslate"><span class="pre">:empty:</span></code> tag to make it more obvious: <code class="docutils literal notranslate"><span class="pre">opt:</span> <span class="pre">str;</span> <span class="pre">:empty:</span></code>
+means the same as <code class="docutils literal notranslate"><span class="pre">opt:</span> <span class="pre">str;</span></code> (because of the semicolon after the
+converter <em>str</em>). For <code class="docutils literal notranslate"><span class="pre">None</span></code> as a default value the <code class="docutils literal notranslate"><span class="pre">:none:</span></code> tag must
+be used.</p>
+<p>With the readwrite tag <code class="docutils literal notranslate"><span class="pre">:rw:</span></code> and the readonly tag <code class="docutils literal notranslate"><span class="pre">:ro:</span></code> exceptions
+to the global access mode (see above) can be set for each option.</p>
+<p>If the <code class="docutils literal notranslate"><span class="pre">:fix:</span></code> tag is used, it indicates that the option cannot be changed
+in a configuration file and is therefore a constant. In this case a
+default value is required.</p>
+<p>The raw tag <code class="docutils literal notranslate"><span class="pre">:raw:</span></code> indicates that for the option value no interpolation
+expansion should be done (see: <a class="reference external" href="https://docs.python.org/3/library/configparser.html#configparser.ConfigParser.get" title="(in Python v3.8)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get()</span></code></a>).</p>
+<p>For configurations that allow options without values the <code class="docutils literal notranslate"><span class="pre">allow_no_value</span></code>
+parameter for <a class="reference internal" href="mod_api.html#easimpconf.configure" title="easimpconf.configure"><code class="xref py py-func docutils literal notranslate"><span class="pre">configure()</span></code></a> must be set to <code class="docutils literal notranslate"><span class="pre">True</span></code> (this is one of
+the keyword arguments that is passed directly the
+<a class="reference external" href="https://docs.python.org/3/library/configparser.html#configparser.ConfigParser" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigParser</span></code></a> constructor). For such an option the tag
+<code class="docutils literal notranslate"><span class="pre">:novalue:</span></code> must be used instead of the name of a converter. If the option
+is present in the configuration it will be set to the value <a class="reference internal" href="mod_api.html#easimpconf.NOVALUE" title="easimpconf.NOVALUE"><code class="xref py py-data docutils literal notranslate"><span class="pre">NOVALUE</span></code></a>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">spec=None</span></code>, no conversion will be done and all options are writeable.</p>
+<p>Example:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1"># spec.ini</span>
+<span class="k">[sec]</span>
+<span class="na">greeting: str; Hello %s!; :raw:</span>
+<span class="na">answer: int; :req:</span>
+<span class="na">string: upper</span>
+<span class="na">bar: str; :rw:</span>
+
+<span class="c1"># conf.ini</span>
+<span class="k">[sec]</span>
+<span class="na">answer: 42</span>
+<span class="na">string: abc</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">convs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;upper&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="o">.</span><span class="n">upper</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="s1">&#39;conf.ini&#39;</span><span class="p">,</span> <span class="s1">&#39;spec.ini&#39;</span><span class="p">,</span> <span class="n">converters</span><span class="o">=</span><span class="n">convs</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span><span class="p">[</span><span class="s1">&#39;sec&#39;</span><span class="p">,</span><span class="s1">&#39;greeting&#39;</span><span class="p">]</span>
+<span class="go">&#39;Hello %s!&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span><span class="o">.</span><span class="n">sec_answer</span>
+<span class="go">42</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span><span class="o">.</span><span class="n">sec_string</span>
+<span class="go">&#39;ABC&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="s1">&#39;sec&#39;</span><span class="p">,</span> <span class="s1">&#39;foo&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">conf</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="s1">&#39;sec&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">conf</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span><span class="p">[</span><span class="s1">&#39;sec&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">]</span>
+<span class="go">&lt;NOTFOUND&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span><span class="p">[</span><span class="s1">&#39;sec&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;quux&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span><span class="p">[</span><span class="s1">&#39;sec&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">]</span>
+<span class="go">&#39;quux&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span><span class="o">.</span><span class="n">sec_string</span> <span class="o">=</span> <span class="s1">&#39;XYZ&#39;</span>
+<span class="gt">Traceback (most recent call last):</span>
+  <span class="c">...</span>
+<span class="gr">AttributeError</span>: <span class="n">can&#39;t set attribute</span>
+</pre></div>
+</div>
+<p id="ref-wildcards">Wildcards can be used in section and option names. Wildcard character(s)
+must be defined explicitly in the <code class="docutils literal notranslate"><span class="pre">[_configspec_]</span></code> section, e. g.:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1"># spec.ini</span>
+<span class="k">[_configspec_]</span>
+<span class="na">wildcard: *</span>
+
+<span class="k">[menu]</span>
+<span class="na">title: str; :req:</span>
+
+<span class="k">[item_*]</span>
+<span class="na">title: str; :req:</span>
+<span class="na">command: str; :req:</span>
+
+<span class="c1"># conf.ini</span>
+<span class="k">[menu]</span>
+<span class="na">title: Testmenu</span>
+
+<span class="k">[item_1]</span>
+<span class="na">title: Test config</span>
+<span class="na">command: pytest config.py</span>
+
+<span class="k">[item_2]</span>
+<span class="na">title: Test crypto</span>
+<span class="na">command: pytest crypto.py</span>
+</pre></div>
+</div>
+<p>When wildcards are used in option names these options cannot have
+default values.</p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2020, Andreas Suhre.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
