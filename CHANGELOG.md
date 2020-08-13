@@ -1,6 +1,7 @@
 History
 -------
 
+**2020-08-13 (0.2.1)**
  - Bugfix: some problems with default values from the specification
 
 **2020-08-09 (0.2.0)**
