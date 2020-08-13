@@ -116,7 +116,7 @@ class Spec:
                                            flag, raw, default,
                                            wildcard and wildcard in sec,
                                            wildcard and wildcard in opt)
-                if spec_str is not None and not (fix or raw):
+                if spec_str is not None and sec in defaults and not (fix or raw):
                     defaults[sec][opt] = spec_str
         self._data = specs
         self._wildcard = wildcard
