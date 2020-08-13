@@ -72,6 +72,7 @@ class Spec:
                         f'option {opt!r} in section {sec!r}: only one of '
                         f' {ro_tag!r}, {rw_tag!r}, {fix_tag!r} allowed')
                 raw = raw_tag in t
+                spec_str = None
                 for s in t[1:]:
                     if s not in (req_tag, ro_tag, rw_tag, fix_tag, raw_tag):
                         if req:
@@ -90,6 +91,7 @@ class Spec:
                                 default = None
                             else:
                                 default = converter(s)
+                                spec_str = s
                         except Exception as ex:
                             raise SpecError(
                                 f'error converting default value {s!r} for '
@@ -114,8 +116,8 @@ class Spec:
                                            flag, raw, default,
                                            wildcard and wildcard in sec,
                                            wildcard and wildcard in opt)
-                if sec in defaults and not fix and default is not NOTFOUND:
-                    defaults[sec][opt] = default
+                if spec_str is not None and not (fix or raw):
+                    defaults[sec][opt] = spec_str
         self._data = specs
         self._wildcard = wildcard
         self._defaults = defaults

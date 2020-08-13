@@ -152,3 +152,7 @@ must be defined explicitly in the ``[_configspec_]`` section, e. g.:
 
 When wildcards are used in option names these options cannot have
 default values.
+
+Interpolation of values in configuration files works with default values
+from the specification if a value is not present in the configuration file
+(except for section names with wildcards, fixed, raw and None values).
