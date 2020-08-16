@@ -47,6 +47,7 @@ class Spec:
         converters[noval_tag] = None
         specs = {}
         defaults = {}
+        fixed_opts = []
         for sec in cp.sections():
             specs[sec] = {}
             if not wildcard or wildcard not in sec:
@@ -110,30 +111,21 @@ class Spec:
                         'and default value')
                 if fix:
                     flag = None
+                    fixed_opts.append((sec, opt))
                 else:
                     flag = ro or (readonly and not rw)
                 specs[sec][opt] = _OptSpec(converter, conv, req,
                                            flag, raw, default,
                                            wildcard and wildcard in sec,
                                            wildcard and wildcard in opt)
-                if (spec_str is not None and sec in defaults and
-                        not (fix or raw)):
+                if (spec_str is not None and sec in defaults):
                     defaults[sec][opt] = spec_str
-        self._data = specs
-        self._wildcard = wildcard
-        self._defaults = defaults
-
-    @property
-    def data(self):
-        """Return specification data."""
-        return self._data
-
-    @property
-    def wildcard(self):
-        """Return wildcard character(s)."""
-        return self._wildcard
-
-    @property
-    def defaults(self):
-        """Return default option values."""
-        return self._defaults
+        lines = []
+        for sec in defaults:
+            lines.append(f'[{sec}]')
+            for opt, val in defaults[sec].items():
+                lines.append(f'{opt}={val}')
+        self.data = specs
+        self.wildcard = wildcard
+        self.defaults = '\n'.join(lines)
+        self.fixed_opts = fixed_opts

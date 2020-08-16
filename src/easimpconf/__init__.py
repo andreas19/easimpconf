@@ -9,6 +9,7 @@ from collections import namedtuple
 from configparser import ConfigParser
 from functools import lru_cache
 from importlib.resources import read_text
+from io import StringIO
 
 from salmagundi.utils import check_path_like
 
@@ -95,9 +96,6 @@ def _with_spec(cp, create_properties, spec, kwargs):
                             name, opt_spec.flag is not False, value)
                 else:
                     for opt in opts:
-                        if opt_spec.flag is None:
-                            raise ConfigError(
-                                f'option {opt!r} in section {sec!r} is fixed')
                         value = cp.get(sec, opt, raw=opt_spec.raw)
                         if (value is None and
                                 kwargs.get('allow_no_value', False)):
@@ -135,6 +133,31 @@ def _without_spec(cp, create_properties, kwargs):
     return options
 
 
+def _read_conf(cp, conf):
+    if isinstance(conf, ConfigParser):
+        sio = StringIO()
+        conf.write(sio)
+        cp.read_string(sio.getvalue())
+    else:
+        try:
+            check_path_like(conf)
+            with open(conf) as fh:
+                cp.read_file(fh)
+        except TypeError:
+            cp.read_file(conf)
+
+
+def _check_fixed_opts(conf, fixed_opts, kwargs):
+    kwargs.pop('interpolation', None)
+    cp = ConfigParser(interpolation=None, **kwargs)
+    _read_conf(cp, conf)
+    for sec, opt in fixed_opts:
+        if cp.has_option(sec, opt):
+            raise ConfigError(
+                f'option {opt!r} in section {sec!r} is fixed')
+    return cp
+
+
 def configure(conf, spec, *, create_properties=True, converters=None, **kwargs):
     """For an explanation see the :doc:`intro`.
 
@@ -158,25 +181,15 @@ def configure(conf, spec, *, create_properties=True, converters=None, **kwargs):
     :raises ConfigError: if there is a problem with the configuration
     :raises configparser.Error: from :class:`~configparser.ConfigParser`
     """
-    if spec is not None:
-        spec_data = Spec(spec, converters if converters else {})
-    else:
-        spec_data = None
     cp = ConfigParser(**kwargs)
-    if spec_data:
-        cp.read_dict(spec_data.defaults)
-    if isinstance(conf, ConfigParser):
-        cp.read_dict(conf)
-    else:
-        try:
-            check_path_like(conf)
-            with open(conf) as fh:
-                cp.read_file(fh)
-        except TypeError:
-            cp.read_file(conf)
     if spec is None:
+        _read_conf(cp, conf)
         options = _without_spec(cp, create_properties, kwargs)
     else:
+        spec_data = Spec(spec, converters if converters else {})
+        tmp_cp = _check_fixed_opts(conf, spec_data.fixed_opts, kwargs)
+        cp.read_string(spec_data.defaults)
+        _read_conf(cp, tmp_cp)
         options = _with_spec(cp, create_properties, spec_data, kwargs)
 
     def cls_cb(ns):

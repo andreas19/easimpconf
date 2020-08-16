@@ -91,6 +91,7 @@
 <span class="kn">from</span> <span class="nn">configparser</span> <span class="kn">import</span> <span class="n">ConfigParser</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
 <span class="kn">from</span> <span class="nn">importlib.resources</span> <span class="kn">import</span> <span class="n">read_text</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">StringIO</span>
 
 <span class="kn">from</span> <span class="nn">salmagundi.utils</span> <span class="kn">import</span> <span class="n">check_path_like</span>
 
@@ -177,9 +178,6 @@
                             <span class="n">name</span><span class="p">,</span> <span class="n">opt_spec</span><span class="o">.</span><span class="n">flag</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">opt</span> <span class="ow">in</span> <span class="n">opts</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="n">opt_spec</span><span class="o">.</span><span class="n">flag</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                            <span class="k">raise</span> <span class="n">ConfigError</span><span class="p">(</span>
-                                <span class="sa">f</span><span class="s1">&#39;option </span><span class="si">{</span><span class="n">opt</span><span class="si">!r}</span><span class="s1"> in section </span><span class="si">{</span><span class="n">sec</span><span class="si">!r}</span><span class="s1"> is fixed&#39;</span><span class="p">)</span>
                         <span class="n">value</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">sec</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="n">opt_spec</span><span class="o">.</span><span class="n">raw</span><span class="p">)</span>
                         <span class="k">if</span> <span class="p">(</span><span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span>
                                 <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;allow_no_value&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)):</span>
@@ -217,6 +215,31 @@
     <span class="k">return</span> <span class="n">options</span>
 
 
+<span class="k">def</span> <span class="nf">_read_conf</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">conf</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">ConfigParser</span><span class="p">):</span>
+        <span class="n">sio</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">sio</span><span class="p">)</span>
+        <span class="n">cp</span><span class="o">.</span><span class="n">read_string</span><span class="p">(</span><span class="n">sio</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">check_path_like</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+                <span class="n">cp</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">cp</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_check_fixed_opts</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">fixed_opts</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;interpolation&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">cp</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">(</span><span class="n">interpolation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">_read_conf</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">conf</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">sec</span><span class="p">,</span> <span class="n">opt</span> <span class="ow">in</span> <span class="n">fixed_opts</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">cp</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">sec</span><span class="p">,</span> <span class="n">opt</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ConfigError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;option </span><span class="si">{</span><span class="n">opt</span><span class="si">!r}</span><span class="s1"> in section </span><span class="si">{</span><span class="n">sec</span><span class="si">!r}</span><span class="s1"> is fixed&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cp</span>
+
+
 <div class="viewcode-block" id="configure"><a class="viewcode-back" href="../mod_api.html#easimpconf.configure">[docs]</a><span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">create_properties</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">converters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;For an explanation see the :doc:`intro`.</span>
 
@@ -240,25 +263,15 @@
 <span class="sd">    :raises ConfigError: if there is a problem with the configuration</span>
 <span class="sd">    :raises configparser.Error: from :class:`~configparser.ConfigParser`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">spec</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">spec_data</span> <span class="o">=</span> <span class="n">Spec</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">converters</span> <span class="k">if</span> <span class="n">converters</span> <span class="k">else</span> <span class="p">{})</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">spec_data</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">cp</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">spec_data</span><span class="p">:</span>
-        <span class="n">cp</span><span class="o">.</span><span class="n">read_dict</span><span class="p">(</span><span class="n">spec_data</span><span class="o">.</span><span class="n">defaults</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">ConfigParser</span><span class="p">):</span>
-        <span class="n">cp</span><span class="o">.</span><span class="n">read_dict</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">check_path_like</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
-                <span class="n">cp</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-            <span class="n">cp</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">spec</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_read_conf</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">conf</span><span class="p">)</span>
         <span class="n">options</span> <span class="o">=</span> <span class="n">_without_spec</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">create_properties</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
+        <span class="n">spec_data</span> <span class="o">=</span> <span class="n">Spec</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">converters</span> <span class="k">if</span> <span class="n">converters</span> <span class="k">else</span> <span class="p">{})</span>
+        <span class="n">tmp_cp</span> <span class="o">=</span> <span class="n">_check_fixed_opts</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">spec_data</span><span class="o">.</span><span class="n">fixed_opts</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">cp</span><span class="o">.</span><span class="n">read_string</span><span class="p">(</span><span class="n">spec_data</span><span class="o">.</span><span class="n">defaults</span><span class="p">)</span>
+        <span class="n">_read_conf</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">tmp_cp</span><span class="p">)</span>
         <span class="n">options</span> <span class="o">=</span> <span class="n">_with_spec</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">create_properties</span><span class="p">,</span> <span class="n">spec_data</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">cls_cb</span><span class="p">(</span><span class="n">ns</span><span class="p">):</span>
