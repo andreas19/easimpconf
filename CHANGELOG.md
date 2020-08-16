@@ -1,6 +1,7 @@
 History
 -------
 
+**2020-08-16 (0.2.2)**
  - Fixed problem with raw and fixed default values from the specification
    for interpolation of values in configuration files
 
